@@ -1,0 +1,35 @@
+        ┌───────────────────────────┐
+        │        User's PC          │
+        │   (Browser: www.foobar.com) │
+        └─────────────┬─────────────┘
+                      │
+                      ▼
+        ┌───────────────────────────┐
+        │           DNS             │
+        │ www.foobar.com → LB IP    │
+        └─────────────┬─────────────┘
+                      │
+                      ▼
+        ┌───────────────────────────┐
+        │    Load Balancer (HAProxy)│
+        └───────┬─────────┬─────────┘
+                │         │
+                ▼         ▼
+   ┌─────────────────┐   ┌─────────────────┐
+   │     Server 1    │   │     Server 2    │
+   │─────────────────│   │─────────────────│
+   │ Web Server      │   │ Web Server      │
+   │ (Nginx)         │   │ (Nginx)         │
+   │ Application Srv │   │ Application Srv │
+   │ Application     │   │ Application     │
+   │ Files           │   │ Files           │
+   │ Database        │   │ Database        │
+   │ (MySQL Primary) │   │ (MySQL Replica) │
+   └─────────────────┘   └─────────────────┘
+                │   Replication   │
+                └───────►─────────┘
+                      │
+                      ▼
+        ┌───────────────────────────┐
+        │    Response to User       │
+        └───────────────────────────┘

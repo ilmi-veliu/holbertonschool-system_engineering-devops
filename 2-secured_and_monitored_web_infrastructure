@@ -1,0 +1,60 @@
+        ┌───────────────────────────┐
+        │        User's PC          │
+        │   https://www.foobar.com) 
+        └─────────────┬─────────────┘
+                      │ 1) DNS lookup
+                      ▼
+        ┌───────────────────────────┐
+        │           DNS             │
+        │ www.foobar.com → LB IP    │
+        └─────────────┬─────────────┘
+                      │
+                      ▼
+        ┌───────────────────────────┐
+        │        FIREWALL #1        │  (Edge / Internet-facing)
+        └─────────────┬─────────────┘
+                      │  HTTPS (TLS)
+                      ▼
+        ┌───────────────────────────┐
+        │  Load Balancer (HAProxy)  │
+        │  - SSL certificate (HTTPS)│  ← TLS termination here
+        │  - Monitoring Agent       │
+        └─────────────┬─────────────┘
+                ┌─────┘             └─────┐
+                │                           │
+                ▼                           ▼
+        ┌───────────────────────────┐   ┌───────────────────────────┐
+        │        FIREWALL #2        │   │        FIREWALL #2        │
+        │   (Protect App/Web tier)  │   │   (Protect App/Web tier)  │
+        └─────────────┬─────────────┘   └─────────────┬─────────────┘
+                      │                               │
+                      ▼                               ▼
+        ┌───────────────────────────┐   ┌───────────────────────────┐
+        │         Server 1          │   │         Server 2          │
+        │───────────────────────────│   │───────────────────────────│
+        │ Web Server (Nginx)        │   │ Web Server (Nginx)        │
+        │ App Server                │   │ App Server                │
+        │ App Files (code base)     │   │ App Files (code base)     │
+        │                           │   │                           │
+        │   ┌───────────────────┐   │   │   ┌───────────────────┐   │
+        │   │    FIREWALL #3    │   │   │   │    FIREWALL #3    │   │
+        │   │ (DB network guard)│   │   │   │ (DB network guard)│   │
+        │   └─────────┬─────────┘   │   │   └─────────┬─────────┘   │
+        │             ▼             │   │             ▼             │
+        │     MySQL (Primary)       │   │     MySQL (Replica)       │
+        │                           │   │                           │
+        │ Monitoring Agent          │   │ Monitoring Agent          │
+        └───────────────────────────┘   └───────────────────────────┘
+                      │                               ▲
+                      └────────── Replication ────────┘
+
+                      ┌────────────────────────────────────────────┐
+                      │   Monitoring Backend (e.g., Sumo Logic)     │
+                      │  (collects logs/metrics from 3 agents)      │
+                      └────────────────────────────────────────────┘
+
+                                   ▼
+                     ┌───────────────────────────┐
+                     │     Response to User      │
+                     │   (HTTPS back to browser) │
+                     └───────────────────────────┘
